@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Repeater Data Table</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-family: Arial, sans-serif;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #f4f4f4;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    #box {
+      max-width: 90%;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-wrapper {
+      max-height: 800px;
+      overflow-y: scroll;  /* Enable vertical scrolling */
+    }
+
+    form {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 100px 100px 25px 100px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #333;
+    }
+
+    .form-sections {
+      display: flex;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+
+    .form-column {
+      flex: 1;
+      min-width: 300px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    .filter-input {
+      padding: 8px;
+      width: 20px;
+      margin-bottom: 1px;
+      font-size: 16px;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+
+    .filter-wrapper {
+      margin: 20px 5px 5px 5px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 240px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+
+    .checkbox-container {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .checkbox-container input {
+      margin-right: 10px;
+    }
+
+    #centerBox {
+      text-align: center;
+    }
+
+    #exportBtn {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 5px;
+    }
+
+    #exportBtn:hover {
+      background-color: #45a049;
+    }
+
+    #exportBtn:active {
+      background-color: #004085;
+    }
+
+    #submitBtn {
+      background-color: #4CAF50;  /* Bootstrap blue */
+      color: white;
+      padding: 10px 20px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #submitBtn:hover {
+      background-color: #45a049;  /* Darker blue on hover */
+    }
+
+    #submitBtn:active {
+      background-color: #004085;
+    }
+
+    .info-tooltip {
+      position: relative;
+      display: inline-block;
+      color: #007bff;
+      font-weight: bold;
+      border: none;
+      background: none;
+      font-size: 20px;
+      cursor: help; /* better UX for tooltips */
+    }
+
+    .info-tooltip .tooltip-text {
+      visibility: hidden;
+      width: 220px;
+      background-color: #333;
+      color: #fff;
+      text-align: left;
+      border-radius: 6px;
+      padding: 8px;
+      position: absolute;
+      z-index: 1;
+      bottom: 125%; /* show above */
+      left: 50%;
+      transform: translateX(-50%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      font-size: 14px;
+      pointer-events: none; /* prevent it from being clickable */
+    }
+
+    .info-tooltip .tooltip-text::after {
+      content: '';
+      position: absolute;
+      top: 100%; /* arrow at bottom of tooltip */
+      left: 50%;
+      margin-left: -5px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: #333 transparent transparent transparent;
+    }
+
+    .info-tooltip:hover .tooltip-text {
+      visibility: visible;
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+<h2>Repeater Information</h2>
+<div id=box>
+  <form id="groupForm">
+    <div class="form-sections">
+      <!-- Analog Section -->
+      <div class="form-column">
+        <label for="analogNumber">Analog Group Number
+          <span class="info-tooltip">ℹ
+            <span class="tooltip-text">
+            All UK analog repeaters will be saved under this group. Use unique number - if you want to separate them.
+            </span>
+          </span>
+        </label>
+        <input type="number" id="analogNumber" name="analogNumber">
+
+        <label for="analogName">Analog Group Name
+          <span class="info-tooltip">ℹ
+            <span class="tooltip-text">
+            Define Analog group name that suits your needs. Typically, it is United Kingdom or UK.
+            </span>
+          </span>
+        </label>
+        <input type="text" id="analogName" name="analogName">
+      </div>
+
+      <!-- D-Star Section -->
+      <div class="form-column">
+        <label for="dstarNumber">D-Star Group Number
+          <span class="info-tooltip">ℹ
+            <span class="tooltip-text">
+            All UK D-Star repeaters will be saved under this group. Use unique number other than Analog.
+            </span>
+          </span>
+        </label>
+        <input type="number" id="dstarNumber" name="dstarNumber">
+        <label for="dstarName">D-Star Group Name
+          <span class="info-tooltip">ℹ
+            <span class="tooltip-text">
+            Define D-Star group name that suits your needs. Typically, it is United Kingdom D-Star or UK D-Star.
+            </span>
+          </span>
+        </label>
+        <input type="text" id="dstarName" name="dstarName">
+
+        <div class="checkbox-container">
+          <input type="checkbox" id="includeDstar" name="includeDstar">
+          <label for="includeDstar">Include D-Star</label>
+        </div>
+      </div>
+    </div>
+  </form>
+  <div id="centerBox">
+    <button id="submitBtn">Submit and Query</button>
+    <button id="exportBtn" style="display: none;">Export Table to CSV</button>
+  </div>
+
+  <!-- Filter Inputs for Multiple Columns -->
+  <div class="filter-wrapper">
+    <input class="filter-input" type="text" id="nameFilter" placeholder="Search by NAME" />
+    <input class="filter-input" type="text" id="subNameFilter" placeholder="Search by SUB NAME" />
+    <input class="filter-input" type="text" id="repeaterCallSignFilter" placeholder="Search by REPEATER CALL SIGN" />
+    <input class="filter-input" type="text" id="frequencyFilter" placeholder="Search by FREQUENCY" />
+  </div>
+  <div class="table-wrapper">
+    <table id="repeaterTable"></table>
+  </div>
+</div>
+<p id="checkboxCheck" style="display:none">Checkbox is CHECKED!</p>
+
+
+
+<script>
+  document.getElementById("submitBtn").addEventListener("click", getRepeaterList);
+
+  // Get the filter elements
+  const nameFilterInput = document.getElementById('nameFilter');
+  const subNameFilterInput = document.getElementById('subNameFilter');
+  const repeaterCallSignFilterInput = document.getElementById('repeaterCallSignFilter');
+  const frequencyFilterInput = document.getElementById('frequencyFilter');
+
+  // Event listeners for the filters
+  nameFilterInput.addEventListener('input', filterTable);
+  subNameFilterInput.addEventListener('input', filterTable);
+  repeaterCallSignFilterInput.addEventListener('input', filterTable);
+  frequencyFilterInput.addEventListener('input', filterTable);
+
+  // Function to filter the table
+  function filterTable() {
+    const nameFilterValue = nameFilterInput.value.toLowerCase();
+    const subNameFilterValue = subNameFilterInput.value.toLowerCase();
+    const repeaterCallSignFilterValue = repeaterCallSignFilterInput.value.toLowerCase();
+    const frequencyFilterValue = frequencyFilterInput.value.toLowerCase(); // Get frequency as text
+
+    const rows = document.querySelectorAll('#repeaterTable tbody tr');
+
+    rows.forEach(row => {
+      const nameText = row.cells[2].textContent.toLowerCase(); // "NAME" is the 3rd column
+      const subNameText = row.cells[3].textContent.toLowerCase(); // "SUB NAME" is the 4th column
+      const repeaterCallSignText = row.cells[4].textContent.toLowerCase(); // "REPEATER CALL SIGN" is the 5th column
+      const frequencyText = row.cells[6].textContent.toLowerCase(); // "FREQUENCY" is the 7th column
+
+      // Check if the row matches the filters
+      const nameMatches = nameText.includes(nameFilterValue);
+      const subNameMatches = subNameText.includes(subNameFilterValue);
+      const repeaterCallSignMatches = repeaterCallSignText.includes(repeaterCallSignFilterValue);
+      const frequencyMatches = frequencyText.includes(frequencyFilterValue); // Frequency contains the value
+
+      if (nameMatches && subNameMatches && repeaterCallSignMatches && frequencyMatches) {
+        row.style.display = ''; // Show row
+      } else {
+        row.style.display = 'none'; // Hide row
+      }
+    });
+  }
+
+  function createTableHeader(headers) {
+    const thead = document.createElement('thead');
+    const row = thead.insertRow();
+    headers.forEach(header => {
+      const th = document.createElement('th');
+      th.textContent = header.toUpperCase();
+      row.appendChild(th);
+    });
+    return thead;
+  }
+
+  function createTableBody(data, headers, groupNo, groupName, type) {
+    const tbody = document.createElement('tbody');
+    data.forEach(item => {
+      const row = tbody.insertRow();
+      headers.forEach(header => {
+        if (header === "Group No") {
+          const cell = row.insertCell();
+          cell.textContent = groupNo;
+        }
+        else if (header === "Group Name") {
+          const cell = row.insertCell();
+          cell.textContent = groupName;
+        }
+        else if (header === "Name") {
+          const cell = row.insertCell();
+          const value = item['town'] ?? '';
+          cell.textContent = value;
+        }
+        else if (header === "Sub Name") {
+          const cell = row.insertCell();
+          const value = 'Keeper Callsign ' + item['keeperCallsign'] ?? '';
+          cell.textContent = value;
+        }
+        else if (header === 'Repeater Call Sign') {
+          var rcs = 'N/A';
+          if (type == "digital") {
+            const value = item['repeater'] + '  B' ?? '';
+            rcs = value
+          }
+          if (type == "analog") {
+            const value = item['repeater'] ?? '';
+            rcs = value
+          }
+          const cell = row.insertCell();
+          cell.textContent = rcs;
+        }
+        else if (header === 'Gateway Call Sign') {
+          var gcs = 'N/A';
+          if (type == "digital") {
+            const value = item['repeater'] + '  G' ?? '';
+            gcs = value;
+          }
+          if (type == "analog") {
+            gcs = '';
+          }
+          const cell = row.insertCell();
+          cell.textContent = gcs;
+        }
+        else if (header === "Frequency") {
+          const cell = row.insertCell();
+          const value = item['tx'] ?? 'N/A';
+          cell.textContent = (value /1000000).toFixed(4);
+        }
+        else if (header === "offset") {
+          const tx = item.tx;
+          const rx = item.rx;
+          const offset = !isNaN(rx) && !isNaN(tx) ? Math.abs((rx - tx)).toFixed(0) : '';
+          const cell = row.insertCell();
+          const value = offset ?? 'N/A';
+          cell.textContent = value /1000000;
+        }
+        else if (header === "Dup") {
+          const tx = item.tx;
+          const rx = item.rx;
+          const offset = !isNaN(rx) && !isNaN(tx) ? (rx - tx).toFixed(0) : '';
+          const cell = row.insertCell();
+          const value = offset ?? 'N/A';
+          var dup = 'N/A'
+          if (value >= 0) {
+            dup = 'DUP+'
+          }
+          if (value < 0) {
+            dup = 'DUP-'
+          }
+          cell.textContent = dup;
+        }
+        else if (header === 'Mode') {
+          var mode = 'N/A';
+          if (type == 'digital') {
+            mode = 'DV'
+          }
+          if (type == 'analog') {
+            mode = 'FM'
+          }
+          const cell = row.insertCell();
+          cell.textContent = mode;
+        }
+        else if (header === 'TONE') {
+          var tone = 'N/A';
+          if (type == "digital") {
+            tone = 'OFF'
+          }
+          if (type == "analog") {
+            tone = 'TSQL'
+          }
+          const cell = row.insertCell();
+          cell.textContent = tone;
+        }
+        else if (header === "Repeater Tone") {
+          const cell = row.insertCell();
+          const value = item['ctcss'] ?? '';
+          cell.textContent = value + 'Hz';
+        }
+        else if (header === "RPT1USE") {
+          const cell = row.insertCell();
+          cell.textContent = 'Yes';
+        }
+        else if (header === "Position") {
+          const cell = row.insertCell();
+          cell.textContent = 'Approximate';
+        }
+        else if (header === "Latitude") {
+          const cell = row.insertCell();
+          const value = maidentolatlon(item['locator'])[0] ?? '';
+          cell.textContent = value;
+        }
+        else if (header === "Longitude") {
+          const cell = row.insertCell();
+          const value = maidentolatlon(item['locator'])[1] ?? '';
+          cell.textContent = value;
+        }
+        else if (header === "UTC Offset") {
+          const cell = row.insertCell();
+          cell.textContent = '+00:00';
+        }
+        else {
+          const cell = row.insertCell();
+          const value = item[header] ?? '';
+          cell.textContent = value;
+        }
+      });
+    });
+  return tbody;
+}
+
+function asciiToDecimal(char) {
+  return char.charCodeAt(0) - 65;
+}
+
+function maidentolatlon(maiden) {
+  maiden = maiden.toLowerCase();
+  if (maiden.length === 4 ) {
+    // Correcting Maiden
+    maiden = maiden + 'aa'
+  }
+  lon = 20*(maiden.charCodeAt(0) - 97) + 2*(maiden.charCodeAt(2) - 48);
+  lat = 10*(maiden.charCodeAt(1) - 97) + maiden.charCodeAt(3) - 48;
+  lon += (maiden.charCodeAt(4) - 97)/12;
+  lat += (maiden.charCodeAt(5) - 97)/24;
+  lon -= 180;
+  lat -= 90;
+  // Adjust to middle of subfield
+  lon += 1/24;
+  lat += 1/48;
+  lon = Math.round(1000*lon)/1000;
+  lat = Math.round(1000*lat)/1000;
+  return [lat, lon];
+}
+
+function getRepeaterList() {
+  fetch('https://api-beta.rsgb.online/all/systems')
+  <!--    fetch('systems.json')-->
+    .then(response => response.json())
+    .then(data => {
+      const table = document.getElementById('repeaterTable');
+      if (!data.data || data.data.length === 0) {
+        table.innerHTML = '<p>No repeater data available.</p>';
+        return;
+      }
+
+      const analog = data.data.filter(item =>
+        Array.isArray(item.modeCodes) && item.modeCodes.includes("A")
+      );
+      const dstar = data.data.filter(item =>
+        Array.isArray(item.modeCodes) && item.modeCodes.includes("D")
+      );
+
+      const formData = {
+        analogNumber: parseInt(document.getElementById('analogNumber').value, 10),
+        analogName: document.getElementById('analogName').value,
+        dstarNumber: parseInt(document.getElementById('dstarNumber').value, 10),
+        dstarName: document.getElementById('dstarName').value,
+        includeDstar: document.getElementById('includeDstar').checked
+      };
+
+      // Defined headers
+      const headers = ['Group No', 'Group Name', 'Name', 'Sub Name', 'Repeater Call Sign', 'Gateway Call Sign', 'Frequency', 'Dup', 'offset', 'Mode', 'TONE','Repeater Tone', 'RPT1USE', 'Position', 'Latitude', 'Longitude', 'UTC Offset'];
+      const thead = createTableHeader(headers);
+      const analogtbody = createTableBody(analog, headers, formData.analogNumber, formData.analogName, 'analog');
+      const dstartbody = createTableBody(dstar, headers, formData.dstarNumber, formData.dstarName, 'digital');
+      table.innerHTML = ''; // Clear any existing content
+      table.appendChild(thead);
+      table.appendChild(analogtbody);
+
+      if (formData.includeDstar == true) {
+        table.appendChild(dstartbody);
+      }
+
+      document.getElementById('exportBtn').style.display = 'inline-block';
+
+    })
+    .catch(error => {
+      console.error('Error fetching data:', error);
+      document.getElementById('repeaterTable').innerHTML = '<p>Error processing repeater data.</p>';
+    });
+
+    document.getElementById('exportBtn').addEventListener('click', function() {
+      var table = document.getElementById('repeaterTable');
+      var rows = table.querySelectorAll('tr');
+      var csvContent = '';
+
+      // Loop through the rows and create CSV content
+      rows.forEach(function(row, index) {
+        var cells = row.querySelectorAll('th, td');
+        var rowArray = [];
+        cells.forEach(function(cell) {
+          rowArray.push(cell.textContent.trim().replace(".", ',')); // Handle commas and quotes
+        });
+        csvContent += rowArray.join(';') + '\n';
+      });
+
+      // Create a link to download the CSV content
+      var downloadLink = document.createElement('a');
+      downloadLink.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent);
+      downloadLink.target = '_blank';
+      downloadLink.download = 'table_data.csv'; // Filename for the downloaded CSV
+      downloadLink.click();
+  });
+  }
+</script>
+</body>
+</html>
