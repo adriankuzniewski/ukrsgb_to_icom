@@ -204,6 +204,29 @@
   </style>
 </head>
 <body>
+  <script>
+    // Target design width (e.g., desktop design width)
+    const designWidth = 1280;
+
+    function adjustViewport() {
+      const deviceWidth = screen.width;
+      const scale = deviceWidth / designWidth;
+
+      // Update meta viewport to scale based on device width
+      const viewport = document.querySelector('meta[name="viewport"]');
+      viewport.setAttribute('content', `width=${designWidth}, initial-scale=${scale}, maximum-scale=${scale}, user-scalable=no`);
+
+      // Optional: Display values on page
+      document.getElementById('width').textContent = deviceWidth;
+      document.getElementById('scale').textContent = scale.toFixed(3);
+    }
+
+    // Run on load
+    window.addEventListener('load', adjustViewport);
+
+    // Optionally re-run on resize (useful for orientation changes)
+    window.addEventListener('resize', adjustViewport);
+  </script>
 <h2>Repeater Information</h2>
 <div id=box>
   <div id="centerBox">
@@ -330,7 +353,7 @@
     const row = thead.insertRow();
     headers.forEach(header => {
       const th = document.createElement('th');
-      th.textContent = header.toUpperCase();
+      th.textContent = header;
       row.appendChild(th);
     });
     return thead;
