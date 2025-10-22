@@ -520,7 +520,7 @@ function maidentolatlon(maiden) {
 
 function getRepeaterList() {
   fetch('https://api-beta.rsgb.online/all/systems')
-  <!--    fetch('systems.json')-->
+  // <!--    fetch('systems.json')-->
     .then(response => response.json())
     .then(data => {
       const table = document.getElementById('repeaterTable');
@@ -528,11 +528,14 @@ function getRepeaterList() {
         table.innerHTML = '<p>No repeater data available.</p>';
         return;
       }
-
-      const analog = data.data.filter(item =>
+      // <!--    Filtering any simplex gateways -->
+      const repeaters =  data.data.filter(item =>
+        !isNaN(item.tx) && !isNaN(item.rx) && (item.rx - item.tx).toFixed(0) !== "0"
+      );
+      const analog = repeaters.filter(item =>
         Array.isArray(item.modeCodes) && item.modeCodes.includes("A")
       );
-      const dstar = data.data.filter(item =>
+      const dstar = repeaters.filter(item =>
         Array.isArray(item.modeCodes) && item.modeCodes.includes("D")
       );
 
