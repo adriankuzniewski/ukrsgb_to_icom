@@ -528,10 +528,12 @@ function getRepeaterList() {
         table.innerHTML = '<p>No repeater data available.</p>';
         return;
       }
-      // <!--    Filtering any simplex gateways -->
-      const repeaters =  data.data.filter(item =>
-        !isNaN(item.tx) && !isNaN(item.rx) && (item.rx - item.tx).toFixed(0) !== "0"
-      );
+      // <!--    Filtering any simplex gateways and sorting-->
+      const repeaters =  data.data
+        .filter(item =>
+        !isNaN(item.tx) && !isNaN(item.rx) && (item.rx - item.tx).toFixed(0) !== "0")
+        .sort((a, b) => a.town.localeCompare(b.town));
+      
       const analog = repeaters.filter(item =>
         Array.isArray(item.modeCodes) && item.modeCodes.includes("A")
       );
